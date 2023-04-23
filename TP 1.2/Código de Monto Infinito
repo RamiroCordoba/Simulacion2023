@@ -1,0 +1,217 @@
+import random
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as ps
+
+
+# Funcion
+def ruleta():
+    numeros = list(range(0, 37))
+    resultado = random.choice(numeros)
+    return resultado
+
+
+# Secciones de ruleta
+fibo = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+rojos = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]
+
+# Bucle y cálculos
+num_simulaciones = 50
+num_tiradas = 10000
+apuesta_gral = 1
+
+def frecuenciaRelativa(r: list) -> list: # Como parámetro la lista de resultados
+    FR = []
+    FA = np.zeros(20)
+    n = 0
+    for i in range(num_tiradas):
+        if r[i] in rojos:
+            FA[n] += 1
+            n = 0
+        else:
+            n += 1
+    for j in range(len(FA)):
+        FR.append(FA[j] / num_tiradas)
+    return FR
+
+def martingala(r: list, a: int) -> list:
+    ganancias = []
+    ganancia = 0
+    apuesta = a
+    for i in range(num_tiradas):
+        ganancia -= apuesta
+        if r[i] in rojos:
+            # Ganó
+            ganancia += apuesta * 2
+            apuesta = a
+        else:
+            # Perdió, dobla la apuesta
+            apuesta *= 2
+        if apuesta <= 0:
+            apuesta = a
+        ganancias.append(ganancia)
+    return ganancias
+
+
+def dalembert(r: list, a: int) -> list:
+    ganancias = []
+    ganancia = 0
+    apuesta = a
+    for i in range(num_tiradas):
+        ganancia -= apuesta
+        if r[i] in rojos:
+            # Ganó
+            ganancia += apuesta * 2
+            apuesta -= a
+        else:
+            # Perdió, suma 'a' a la apuesta
+            apuesta += a
+        if apuesta <= 0:
+            apuesta = a
+        ganancias.append(ganancia)
+    return ganancias
+
+
+def fiboSeq(i):
+    pos = i % len(fibo)
+    return fibo[pos]
+
+
+def fibonacci(r: list, a: int) -> list:
+    ganancias = []
+    ganancia = 0
+    apuesta = a
+    n = 0
+    for i in range(num_tiradas):
+        ganancia -= apuesta
+        if r[i] in rojos:
+            # Ganó
+            ganancia += apuesta * 2
+            if apuesta > 1:
+                apuesta = fiboSeq(n := n - 2)
+            else:
+                apuesta = fiboSeq(n := 0)
+        else:
+            apuesta = fiboSeq(n := n + 1)
+        if apuesta <= 0:
+            apuesta = a
+        ganancias.append(ganancia)
+    return ganancias
+
+promedioGralMG = []
+promedioGralDA = []
+promedioGralFB = []
+
+varianzasMG = []
+varianzasDA = []
+varianzasFB = []
+
+desviosMG = []
+desviosDA = []
+desviosFB = []
+
+gananciasMG = []
+gananciasDA = []
+gananciasFB = []
+
+grafMG = np.zeros(num_tiradas)
+grafDA = np.zeros(num_tiradas)
+grafFB = np.zeros(num_tiradas)
+
+
+def sumaGanancias(l1: list, l2: list):
+    for i in range(num_tiradas):
+        l1[i] += l2[i]
+
+def calculaPromedio(l: list):
+    for i in range(num_tiradas):
+        l[i] /= num_simulaciones
+
+def agregaVarianza(lVar:list, valoresVar:list):
+    lVar.append(np.var(valoresVar))
+
+def calculaVarianza(varianList: list):
+    for i in range(num_simulaciones):
+        varianList[i] /= num_simulaciones
+
+for i in range(num_simulaciones):
+    resultados = []
+    for j in range(num_tiradas):
+        resultados.append(ruleta())
+    gananciasMG = martingala(resultados, apuesta_gral)
+    gananciasDA = dalembert(resultados, apuesta_gral)
+    gananciasFB = fibonacci(resultados, apuesta_gral)
+    #varianza
+    agregaVarianza(varianzasMG,gananciasMG) #suma las varianzas de cada simulacion a una lista de varianzas
+    agregaVarianza(varianzasDA,gananciasDA)
+    agregaVarianza(varianzasFB,gananciasFB)
+
+    sumaGanancias(grafMG, gananciasMG)
+    sumaGanancias(grafDA, gananciasDA)
+    sumaGanancias(grafFB, gananciasFB)
+
+#ajusta valores de varianza por metodo
+calculaVarianza(varianzasMG)
+calculaVarianza(varianzasDA)
+calculaVarianza(varianzasFB) 
+# calcular los promedios por metodo
+calculaPromedio(grafMG)
+calculaPromedio(grafDA)
+calculaPromedio(grafFB)
+
+#graficas de varianzas
+plt.title("Comparación de varianzas")
+plt.plot(varianzasMG,label="Varianza MG")
+plt.plot(varianzasDA,label="Varianza DA")
+plt.plot(varianzasFB,label="Varianza FB")
+plt.legend(loc="upper left")
+plt.show()
+
+plt.title("Varianza MG")
+plt.plot(varianzasMG)
+plt.show()
+plt.title("Varianza DA")
+plt.plot(varianzasDA)
+plt.show()
+plt.title("Varianza FB")
+plt.plot(varianzasFB)
+plt.show()
+
+for i in range(num_simulaciones):
+   desviosMG.append(np.sqrt(varianzasMG[i]))
+   desviosDA.append(np.sqrt(varianzasDA[i]))
+   desviosFB.append(np.sqrt(varianzasFB[i]))
+
+plt.title("Comparación de desvíos")
+plt.plot(desviosMG,label="Desvío MG")
+plt.plot(desviosDA,label="Desvío DA")
+plt.plot(desviosFB,label="Desvío FB")
+plt.legend(loc="upper left")
+plt.show()
+
+plt.title("Desvío MG")
+plt.plot(desviosMG)
+plt.show()
+plt.title("Desvío DA")
+plt.plot(desviosDA)
+plt.show()
+plt.title("Desvío FB")
+plt.plot(desviosFB)
+plt.show()
+
+plt.title("Comparación de promedios de ganancias")
+plt.plot(grafMG, label="Ganancia MG")
+plt.plot(grafDA, label="Ganancia DA")
+plt.plot(grafFB, label="Ganancia FB")
+plt.legend(loc="lower left")
+plt.show()
+
+plt.title("Promedio de ganancia MG")
+plt.plot(grafMG)
+plt.show()
+plt.title("Promedio de ganancia DA")
+plt.plot(grafDA)
+plt.show()
+plt.title("Promedio de ganancia FB")
+plt.plot(grafFB)
+plt.show()
