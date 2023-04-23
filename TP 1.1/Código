@@ -1,0 +1,89 @@
+import random
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Funcion
+def ruleta():
+    numeros = list(range(0, 37))
+
+    resultado = random.choice(numeros)
+
+    return resultado
+
+# Bucle y cálculos
+num_tiradas = 10000
+resultados = []
+frecuencias_7 = []
+promedios = []
+frecuencia_7 = 0
+suma_resultados = 0
+resultados_siete = np.zeros(num_tiradas)
+varianzas = np.zeros(num_tiradas)
+desvios = np.zeros(num_tiradas)
+
+for i in range(num_tiradas):
+    resultado = ruleta()
+    resultados.append(resultado)
+    print('Salió el número ', resultado)
+    suma_resultados += int(resultado)
+    promedios.append(suma_resultados / int(len(resultados))) # Calculo y guardado de los promedios
+    if resultado == 7:
+        frecuencia_7 += 1
+        resultados_siete[i] = 1
+
+    frecuencias_7.append(frecuencia_7 / (i+1)) # Calculo y guardado de frecuencias del número 7
+    
+    varianzas[i] = np.var(resultados_siete[:i+1]) # Calculo y guardado de varianzas del número 7
+    
+    desvios[i] = np.std(resultados_siete[:i+1]) # Calculo y guardado de desvios del número 7
+
+promedio_estimado = suma_resultados / num_tiradas # Calculo de promedio esperado
+
+frecuencia_estimada = resultados.count(7)
+frecuencia_relativa_estimada = frecuencia_estimada / len(resultados) # Calculo de frecuencia relativa estimada
+
+desvio_estimado = np.std(resultados_siete) # Calculo de desvio estimado
+
+varianza_estimada = np.var(resultados_siete) # Calculo de varianza estimada
+
+# Gráfica promedio y promedio estimado
+plt.plot(range(1,num_tiradas+1), promedios)
+plt.axhline(y= promedio_estimado, color = 'r', linestyle = '--')
+plt.title("Promedios")
+plt.xlabel("Número de tiradas")
+plt.ylabel("Promedio")
+plt.ylim(0, 30)
+plt.show()
+
+# Gráfica frecuencia relativa y frecuencia relativa estimada del número 7
+plt.plot(range(1,num_tiradas+1), frecuencias_7)
+plt.axhline(y= frecuencia_relativa_estimada, color = 'r', linestyle = '--')
+plt.title("Frecuencia relativa del número 7")
+plt.xlabel("Número de tiradas")
+plt.ylabel("Frecuencia relativa")
+plt.ylim(0, 0.25)
+plt.show()
+
+# Gráfica varianza y varianza estimada
+plt.plot(range(1,num_tiradas+1), varianzas)
+plt.axhline(y= varianza_estimada, color = 'r', linestyle = '--')
+plt.title("Varianzas")
+plt.xlabel("Número de tiradas")
+plt.ylabel("Varianza")
+plt.ylim(0, 0.25)
+plt.show()
+
+# Gráfica desvío y desvío estimado
+plt.plot(range(1,num_tiradas+1), desvios)
+plt.axhline(y= desvio_estimado, color = 'r', linestyle = '--')
+plt.title("Desvíos")
+plt.xlabel("Número de tiradas")
+plt.ylabel("Desvío")
+plt.ylim(0, 0.25)
+plt.show()
+
+print('El número 7 salió ', frecuencia_7, ' veces')
+print('Desvio Est', desvio_estimado)
+print('Var Est',varianza_estimada)
+print('Prom Est',promedio_estimado)
+print('Frec Est', frecuencia_relativa_estimada)
