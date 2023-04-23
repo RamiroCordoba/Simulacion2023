@@ -1,0 +1,233 @@
+import random
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as ps
+
+
+# Funcion
+def ruleta():
+    numeros = list(range(0, 37))
+    resultado = random.choice(numeros)
+    return resultado
+
+
+# Secciones de ruleta
+fibo = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+rojos = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]
+
+# Bucle y cálculos
+num_simulaciones = 50
+num_tiradas = 10000
+monto_inicial = 500
+apuesta_gral = 5
+
+def frecuenciaRelativa(r: list) -> list: # Como parámetro la lista de resultados
+    FR = []
+    FA = np.zeros(20)
+    n = 0
+    for i in range(num_tiradas):
+        if r[i] in rojos:
+            FA[n] += 1
+            n = 0
+        else:
+            n += 1
+    for j in range(len(FA)):
+        FR.append(FA[j] / num_tiradas)
+    return FR
+
+def martingala(r: list, a: int, m: int) -> list:
+    flujo = []
+    apuesta = a
+    for i in range(num_tiradas):
+        m -= apuesta
+        if r[i] in rojos:
+            # Ganó
+            m += apuesta * 2
+            apuesta = a
+        else:
+            # Perdió, dobla la apuesta
+            apuesta *= 2
+        if apuesta <= 0:
+            apuesta = a
+        flujo.append(m)
+        if m < apuesta:
+            while len(flujo) <= len(r) - 1:
+                flujo.append(m)
+            break
+        if len(flujo) == len(r):
+            break
+    return flujo
+
+
+def dalembert(r: list, a: int, m: int) -> list:
+    flujo = []
+    apuesta = a
+    for i in range(num_tiradas):
+        m -= apuesta
+        if r[i] in rojos:
+            # Ganó
+            m += apuesta * 2
+            apuesta -= a
+        else:
+            # Perdió, suma 'a' a la apuesta
+            apuesta += a
+        if apuesta <= 0:
+            apuesta = a
+        flujo.append(m)
+        if m < apuesta:
+            while len(flujo) <= len(r) - 1:
+                flujo.append(m)
+            break
+        if len(flujo) == len(r):
+            break
+    return flujo
+
+
+def fiboSeq(i):
+    pos = i % len(fibo)
+    return fibo[pos]
+
+
+def fibonacci(r: list, a: int, m: int) -> list:
+    flujo = []
+    apuesta = a
+    n = 0
+    for i in range(num_tiradas):
+        m -= apuesta
+        if r[i] in rojos:
+            # Ganó
+            m += apuesta * 2
+            if apuesta > 1:
+                apuesta = fiboSeq(n := n - 2)
+            else:
+                apuesta = fiboSeq(n := 0)
+        else:
+            apuesta = fiboSeq(n := n + 1)
+        if apuesta <= 0:
+            apuesta = a
+        flujo.append(m)
+        if m < apuesta:
+            while len(flujo) <= len(r) - 1:
+                flujo.append(m)
+            break
+        if len(flujo) == len(r):
+            break
+    return flujo
+
+promedioGralMG = []
+promedioGralDA = []
+promedioGralFB = []
+
+varianzasMG = []
+varianzasDA = []
+varianzasFB = []
+
+desviosMG = []
+desviosDA = []
+desviosFB = []
+
+flujoMG = []
+flujoDA = []
+flujoFB = []
+
+grafMG = np.zeros(num_tiradas)
+grafDA = np.zeros(num_tiradas)
+grafFB = np.zeros(num_tiradas)
+
+
+def sumaGanancias(l1: list, l2: list):
+    for i in range(num_tiradas):
+        l1[i] += l2[i]
+
+def calculaPromedio(l: list):
+    for i in range(num_tiradas):
+        l[i] /= num_simulaciones
+
+def agregaVarianza(lVar:list, valoresVar:list):
+    lVar.append(np.var(valoresVar))
+
+def calculaVarianza(varianList: list):
+    for i in range(num_simulaciones):
+        varianList[i] /= num_simulaciones
+
+for i in range(num_simulaciones):
+    resultados = []
+    for j in range(num_tiradas):
+        resultados.append(ruleta())
+    flujoMG = martingala(resultados, apuesta_gral, monto_inicial)
+    flujoDA = dalembert(resultados, apuesta_gral, monto_inicial)
+    flujoFB = fibonacci(resultados, apuesta_gral, monto_inicial)
+    #varianza
+    agregaVarianza(varianzasMG,flujoMG) #suma las varianzas de cada simulacion a una lista de varianzas
+    agregaVarianza(varianzasDA,flujoDA)
+    agregaVarianza(varianzasFB,flujoFB)
+
+    sumaGanancias(grafMG, flujoMG)
+    sumaGanancias(grafDA, flujoDA)
+    sumaGanancias(grafFB, flujoFB)
+
+#ajusta valores de varianza por metodo
+calculaVarianza(varianzasMG)
+calculaVarianza(varianzasDA)
+calculaVarianza(varianzasFB)
+# calcular los promedios por metodo
+calculaPromedio(grafMG)
+calculaPromedio(grafDA)
+calculaPromedio(grafFB)
+
+#graficas de varianzas
+plt.title("Comparación de varianzas")
+plt.plot(varianzasMG,label="Varianza MG")
+plt.plot(varianzasDA,label="Varianza DA")
+plt.plot(varianzasFB,label="Varianza FB")
+plt.legend(loc="upper left")
+plt.show()
+
+plt.title("Varianza MG")
+plt.plot(varianzasMG)
+plt.show()
+plt.title("Varianza DA")
+plt.plot(varianzasDA)
+plt.show()
+plt.title("Varianza FB")
+plt.plot(varianzasFB)
+plt.show()
+
+for i in range(num_simulaciones):
+   desviosMG.append(np.sqrt(varianzasMG[i]))
+   desviosDA.append(np.sqrt(varianzasDA[i]))
+   desviosFB.append(np.sqrt(varianzasFB[i]))
+
+plt.title("Comparación de desvíos")
+plt.plot(desviosMG,label="Desvío MG")
+plt.plot(desviosDA,label="Desvío DA")
+plt.plot(desviosFB,label="Desvío FB")
+plt.legend(loc="upper left")
+plt.show()
+
+plt.title("Desvío MG")
+plt.plot(desviosMG)
+plt.show()
+plt.title("Desvío DA")
+plt.plot(desviosDA)
+plt.show()
+plt.title("Desvío FB")
+plt.plot(desviosFB)
+plt.show()
+
+plt.title("Comparación de promedios de flujos")
+plt.plot(grafMG, label="Flujo MG")
+plt.plot(grafDA, label="Flujo DA")
+plt.plot(grafFB, label="Flujo FB")
+plt.legend(loc="lower left")
+plt.show()
+
+plt.title("Promedio de flujo MG")
+plt.plot(grafMG)
+plt.show()
+plt.title("Promedio de flujo DA")
+plt.plot(grafDA)
+plt.show()
+plt.title("Promedio de flujo FB")
+plt.plot(grafFB)
+plt.show()
