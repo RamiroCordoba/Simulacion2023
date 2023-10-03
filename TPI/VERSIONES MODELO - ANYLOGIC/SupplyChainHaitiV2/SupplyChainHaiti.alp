@@ -25,7 +25,12 @@ locationToRegion.put("5", "Ouest");
 locationToRegion.put("6", "Département du Sud-Esti");
 locationToRegion.put("9", "Département du Sud");
 locationToRegion.put("8", "Département des Nippes");
-locationToRegion.put("10", "Département de la Grande-Anse");]]></StartupCode>
+locationToRegion.put("10", "Département de la Grande-Anse");
+
+for (Vehicle v : vehicles){
+	distributor.random().assignedVehicles.add(v);
+}
+]]></StartupCode>
 			<Generic>false</Generic>
 			<GenericParameter>
 				<Id>1693328332299</Id>
@@ -328,7 +333,7 @@ locationToRegion.put("10", "Département de la Grande-Anse");]]></StartupCode>
 							<Name><![CDATA[location]]></Name>
 						</Parameter>
 						<Parameter>
-							<Name><![CDATA[consuptionPerDay]]></Name>
+							<Name><![CDATA[consumptionPerDay]]></Name>
 						</Parameter>
 						<Parameter>
 							<Name><![CDATA[population]]></Name>
@@ -406,7 +411,7 @@ locationToRegion.put("10", "Département de la Grande-Anse");]]></StartupCode>
 							<Key>
 								<PackageName><![CDATA[supplychainhaiti]]></PackageName>
 								<ClassName><![CDATA[Retailers]]></ClassName>
-								<ItemName><![CDATA[consuptionPerDay]]></ItemName>
+								<ItemName><![CDATA[consumptionPerDay]]></ItemName>
 							</Key>
 							<Value>
 								<PackageName><![CDATA[supplychainhaiti]]></PackageName>
@@ -39266,6 +39271,28 @@ locationToRegion.put("10", "Département de la Grande-Anse");]]></StartupCode>
 		<ActiveObjectClass>
 			<Id>1693330607644</Id>
 			<Name><![CDATA[Distributors]]></Name>
+			<StartupCode><![CDATA[ArrayList<Retailers> closestRetailers = new ArrayList<Retailers>();
+
+for (Retailers retailer : main.retailerses) {
+    double distance = this.distanceTo(retailer);
+
+    // Si la lista de minoristas más cercanos tiene menos de 3 elementos, simplemente añade el minorista.
+    if (closestRetailers.size() < 4) {
+        closestRetailers.add(retailer);
+    } else {
+        // Si ya hay 3 minoristas en la lista, encuentra el minorista con la distancia más larga
+        Retailers farthestRetailer = Collections.max(closestRetailers, Comparator.comparingDouble(d -> this.distanceTo(d)));
+
+        // Si la distancia del minorista actual es menor que la del minorista más lejano en la lista,
+        // reemplaza al minorista más lejano con el minorista actual.
+        if (distance < this.distanceTo(farthestRetailer)) {
+            closestRetailers.remove(farthestRetailer);
+            closestRetailers.add(retailer);
+        }
+    }
+}
+connectedRetailers = closestRetailers;
+]]></StartupCode>
 			<Generic>false</Generic>
 			<GenericParameter>
 				<Id>1693330607650</Id>
@@ -39394,7 +39421,100 @@ locationToRegion.put("10", "Département de la Grande-Anse");]]></StartupCode>
 						</ParameterEditor>
 					</Properties>                 
 				</Variable>
+				<Variable Class="CollectionVariable">
+					<Id>1696339430443</Id>
+					<Name><![CDATA[connectedRetailers]]></Name>
+					<X>260</X><Y>40</Y>
+					<Label><X>10</X><Y>0</Y></Label>
+					<PublicFlag>false</PublicFlag>
+					<PresentationFlag>true</PresentationFlag>
+					<ShowLabel>true</ShowLabel>
+					<Properties SaveInSnapshot="true" AccessType="public" StaticVariable="false">
+						<CollectionClass><![CDATA[ArrayList]]></CollectionClass>
+						<ElementClass><![CDATA[Retailers]]></ElementClass>
+						<ValueElementClass><![CDATA[String]]></ValueElementClass>
+					</Properties>
+
+				</Variable>
+				<Variable Class="CollectionVariable">
+					<Id>1696339671806</Id>
+					<Name><![CDATA[assignedVehicles]]></Name>
+					<X>260</X><Y>80</Y>
+					<Label><X>10</X><Y>0</Y></Label>
+					<PublicFlag>false</PublicFlag>
+					<PresentationFlag>true</PresentationFlag>
+					<ShowLabel>true</ShowLabel>
+					<Properties SaveInSnapshot="true" AccessType="public" StaticVariable="false">
+						<CollectionClass><![CDATA[ArrayList]]></CollectionClass>
+						<ElementClass><![CDATA[Vehicle]]></ElementClass>
+						<ValueElementClass><![CDATA[String]]></ValueElementClass>
+					</Properties>
+
+				</Variable>
 			</Variables>
+			<Events>
+				<Event>
+					<Id>1696339215649</Id>
+					<Name><![CDATA[CheckDeliveries]]></Name>
+					<X>80</X><Y>120</Y>
+					<Label><X>10</X><Y>0</Y></Label>
+					<PublicFlag>false</PublicFlag>
+					<PresentationFlag>true</PresentationFlag>
+					<ShowLabel>true</ShowLabel>
+					<Properties TriggerType="timeout" Mode="cyclic">
+						<Timeout Class="CodeUnitValue">
+							<Code><![CDATA[1]]></Code>
+							<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
+						</Timeout>
+						<Rate Class="CodeUnitValue">
+							<Code><![CDATA[1]]></Code>
+							<Unit Class="RateUnits"><![CDATA[PER_DAY]]></Unit>
+						</Rate>
+						<OccurrenceAtTime>true</OccurrenceAtTime>
+						<OccurrenceDate>1696406400000</OccurrenceDate>
+						<OccurrenceTime Class="CodeUnitValue">
+							<Code><![CDATA[0]]></Code>
+							<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
+						</OccurrenceTime>
+						<RecurrenceCode Class="CodeUnitValue">
+							<Code><![CDATA[1]]></Code>
+							<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
+						</RecurrenceCode>
+						<Condition><![CDATA[false]]></Condition>
+					</Properties>
+					<Action><![CDATA[for (Retailers ret : connectedRetailers){
+	if (ret.requieresResources()){
+		sendResources(ret.consumptionPerDay*4, ret);
+	}
+}]]></Action>
+				</Event>
+			</Events>
+			<Functions>
+				<Function AccessType="default" StaticFunction="false">
+					<ReturnModificator>VOID</ReturnModificator>
+					<ReturnType><![CDATA[double]]></ReturnType>
+					<Id>1696339915029</Id>
+					<Name><![CDATA[sendResources]]></Name>
+					<X>80</X><Y>150</Y>
+					<Label><X>10</X><Y>0</Y></Label>
+					<PublicFlag>false</PublicFlag>
+					<PresentationFlag>true</PresentationFlag>
+					<ShowLabel>true</ShowLabel>
+					<Parameter>
+						<Name><![CDATA[amount]]></Name>
+						<Type><![CDATA[double]]></Type>
+					</Parameter>
+					<Parameter>
+						<Name><![CDATA[ret]]></Name>
+						<Type><![CDATA[Retailers]]></Type>
+					</Parameter>
+					<Body><![CDATA[ProductOrder order = new ProductOrder((ret.consumptionPerDay*4), ret);
+Vehicle truck = findFirst(this.assignedVehicles,v -> v.inState(Vehicle.AtDistributor));
+if (truck != null){
+  	send (order, truck);
+  }]]></Body>
+				</Function>
+			</Functions>
 			<AgentLinks>
 				<AgentLink>
 					<Id>1693330607645</Id>
@@ -39407,6 +39527,26 @@ locationToRegion.put("10", "Département de la Grande-Anse");]]></StartupCode>
 					<HandleReceiveInConnections>false</HandleReceiveInConnections>
 					<AgentLinkType>COLLECTION_OF_LINKS</AgentLinkType>
 					<AgentLinkBidirectional>true</AgentLinkBidirectional>
+					<MessageType><![CDATA[Object]]></MessageType>
+					<LineStyle>SOLID</LineStyle>
+					<LineWidth>1</LineWidth>
+					<LineColor>-16777216</LineColor>
+					<LineZOrder>UNDER_AGENTS</LineZOrder>
+					<LineArrow>NONE</LineArrow>
+					<LineArrowPosition>END</LineArrowPosition>
+				</AgentLink>
+				<AgentLink>
+					<Id>1696340712928</Id>
+					<Name><![CDATA[assignedVehicle]]></Name>
+					<X>260</X><Y>130</Y>
+					<Label><X>15</X><Y>0</Y></Label>
+					<PublicFlag>false</PublicFlag>
+					<PresentationFlag>true</PresentationFlag>
+					<ShowLabel>true</ShowLabel>
+					<HandleReceiveInConnections>false</HandleReceiveInConnections>
+					<AgentLinkType>COLLECTION_OF_LINKS</AgentLinkType>
+					<AgentReferenceId>1693333504101</AgentReferenceId>
+					<AgentLinkBidirectional>false</AgentLinkBidirectional>
 					<MessageType><![CDATA[Object]]></MessageType>
 					<LineStyle>SOLID</LineStyle>
 					<LineWidth>1</LineWidth>
@@ -39852,21 +39992,6 @@ locationToRegion.put("10", "Département de la Grande-Anse");]]></StartupCode>
 						</InitialValue>
 					</Properties>
 				</Variable>
-				<Variable Class="PlainVariable">
-					<Id>1695155828066</Id>
-					<Name><![CDATA[needsResources]]></Name>
-					<X>260</X><Y>100</Y>
-					<Label><X>10</X><Y>0</Y></Label>
-					<PublicFlag>false</PublicFlag>
-					<PresentationFlag>true</PresentationFlag>
-					<ShowLabel>true</ShowLabel>
-					<Properties SaveInSnapshot="true" Constant="false" AccessType="public" StaticVariable="false">
-						<Type><![CDATA[boolean]]></Type>        
-						<InitialValue Class="CodeValue">
-							<Code><![CDATA[true]]></Code>
-						</InitialValue>
-					</Properties>
-				</Variable>
 				<Variable Class="Parameter">
 					<Id>1693359419593</Id>
 					<Name><![CDATA[location]]></Name>
@@ -39890,7 +40015,7 @@ locationToRegion.put("10", "Département de la Grande-Anse");]]></StartupCode>
 				</Variable>
 				<Variable Class="Parameter">
 					<Id>1695135362410</Id>
-					<Name><![CDATA[consuptionPerDay]]></Name>
+					<Name><![CDATA[consumptionPerDay]]></Name>
 					<X>80</X><Y>150</Y>
 					<Label><X>10</X><Y>0</Y></Label>
 					<PublicFlag>false</PublicFlag>
@@ -39956,7 +40081,7 @@ locationToRegion.put("10", "Département de la Grande-Anse");]]></StartupCode>
 			<Events>
 				<Event>
 					<Id>1693351734786</Id>
-					<Name><![CDATA[requestDelivery]]></Name>
+					<Name><![CDATA[_requestDelivery]]></Name>
 					<X>80</X><Y>70</Y>
 					<Label><X>10</X><Y>0</Y></Label>
 					<PublicFlag>false</PublicFlag>
@@ -39968,7 +40093,7 @@ locationToRegion.put("10", "Département de la Grande-Anse");]]></StartupCode>
 							<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
 						</Timeout>
 						<Rate Class="CodeUnitValue">
-							<Code><![CDATA[1]]></Code>
+							<Code><![CDATA[0]]></Code>
 							<Unit Class="RateUnits"><![CDATA[PER_HOUR]]></Unit>
 						</Rate>
 						<OccurrenceAtTime>true</OccurrenceAtTime>
@@ -39984,12 +40109,13 @@ locationToRegion.put("10", "Département de la Grande-Anse");]]></StartupCode>
 						<Condition><![CDATA[needsResources]]></Condition>
 					</Properties>
 					<Action><![CDATA[if (this.resourcesCount <= this.maximumCapacity*0.5){
-	ProductOrder order = new ProductOrder(uniform_discr(10,20), this);
+	//this.consumptionPerDay*4 es la cantidad de recursos que va a pedir
+	ProductOrder order = new ProductOrder((this.consumptionPerDay*4), this);
 	Vehicle truck = getNearestAgentByRoute(filter(main.vehicles,
 	                v -> v.inState(Vehicle.AtDistributor)));
 	if (truck != null){
 	    send (order, truck);   
-		//this.resourcesCount += 60000;
+		
 		traceln("el contador de recursos es:"+ this.resourcesCount);
 		}
 }
@@ -39998,7 +40124,7 @@ locationToRegion.put("10", "Département de la Grande-Anse");]]></StartupCode>
 				</Event>
 				<Event>
 					<Id>1695136357222</Id>
-					<Name><![CDATA[consuption]]></Name>
+					<Name><![CDATA[consumption]]></Name>
 					<X>80</X><Y>320</Y>
 					<Label><X>10</X><Y>0</Y></Label>
 					<PublicFlag>false</PublicFlag>
@@ -40025,15 +40151,14 @@ locationToRegion.put("10", "Département de la Grande-Anse");]]></StartupCode>
 						</RecurrenceCode>
 						<Condition><![CDATA[false]]></Condition>
 					</Properties>
-					<Action><![CDATA[if (resourcesCount >= consuptionPerDay){
-	calculateColour();
-	resourcesCount -= consuptionPerDay;
+					<Action><![CDATA[if (resourcesCount >= consumptionPerDay){
+	resourcesCount -= consumptionPerDay;
 	}
 else {
-	calculateColour();
 	resourcesCount = 0;
 	daysWithoutResources +=1;
-};]]></Action>
+};
+calculateColour();]]></Action>
 				</Event>
 			</Events>
 			<Functions>
@@ -40052,7 +40177,7 @@ traceln("la locacion es:"+ this.location);
 if (regionName != null) {
   GISRegion reg = findFirst(main.regions, r -> r.getTitle().equalsIgnoreCase(regionName));
 
-if (this.consuptionPerDay <= this.resourcesCount){
+if (this.consumptionPerDay <= this.resourcesCount){
 	  int newRed = (int) (this.red - 50);
   	  int newGreen = (int) (this.green + 50);
   	  
@@ -40081,7 +40206,7 @@ else {
 					<ReturnModificator>VOID</ReturnModificator>
 					<ReturnType><![CDATA[double]]></ReturnType>
 					<Id>1695156327369</Id>
-					<Name><![CDATA[request]]></Name>
+					<Name><![CDATA[_request]]></Name>
 					<X>80</X><Y>450</Y>
 					<Label><X>10</X><Y>0</Y></Label>
 					<PublicFlag>false</PublicFlag>
@@ -40095,6 +40220,18 @@ if (truck != null){
 	//this.resourcesCount += 60000;
 	traceln("el contador de recursos es:"+ this.resourcesCount);
 	}]]></Body>
+				</Function>
+				<Function AccessType="default" StaticFunction="false">
+					<ReturnModificator>RETURNS_VALUE</ReturnModificator>
+					<ReturnType><![CDATA[boolean]]></ReturnType>
+					<Id>1696339512036</Id>
+					<Name><![CDATA[requieresResources]]></Name>
+					<X>290</X><Y>100</Y>
+					<Label><X>10</X><Y>0</Y></Label>
+					<PublicFlag>false</PublicFlag>
+					<PresentationFlag>true</PresentationFlag>
+					<ShowLabel>true</ShowLabel>
+					<Body><![CDATA[return ((resourcesCount / maximumCapacity) < 0.5);]]></Body>
 				</Function>
 			</Functions>
 			<AgentLinks>
@@ -40587,7 +40724,6 @@ if (truck != null){
 					<PresentationFlag>true</PresentationFlag>
 					<ShowLabel>true</ShowLabel>
 					<Properties Width="120" Height="40">
-						<EntryAction><![CDATA[order.retailer.resourcesCount += 60000;]]></EntryAction>
 						<FillColor/>
 					</Properties>
 				</StatechartElement>
@@ -40634,6 +40770,7 @@ if (truck != null){
 					<Properties Source="1693333863415" Target="1693333881070" Trigger="message">
 						<Action><![CDATA[moveTo(msg.retailer);
 order = msg;
+this.Distributor.resourcesCount -= msg.amount;
 distanceTravel += (this.Distributor.distanceByRoute(msg.retailer))*2;
 traceln( "distancia recorrida: " + this.distanceTravel/1000);]]></Action>
 						<Timeout Class="CodeUnitValue">
@@ -40728,7 +40865,24 @@ traceln( "distancia recorrida: " + this.distanceTravel/1000);]]></Action>
 					</Points>
 					<IconOffset>40.0</IconOffset>
 					<Properties Source="1693334202026" Target="1693864713455" Trigger="timeout">
-						<Action><![CDATA[moveTo(Distributor)]]></Action>
+						<Action><![CDATA[moveTo(Distributor);
+Retailers ret = order.retailer;
+//Dejar recursos en el retailer
+if ( (ret.maximumCapacity - ret.resourcesCount) > order.amount) {
+	ret.resourcesCount += order.amount;
+	order.amount = 0;
+} else {
+	//Si no puede guardar todo se queda con lo que sobra
+	ret.resourcesCount += (ret.maximumCapacity - ret.resourcesCount);
+	order.amount -= (ret.maximumCapacity - ret.resourcesCount);
+}
+//si no pudo dejar todo en el retailer lo guarda 
+//de vuelta en el distribuidor
+if (order.amount >= 0){
+	Distributor.resourcesCount += order.amount;
+	order.amount = 0;
+}
+]]></Action>
 						<Timeout Class="CodeUnitValue">
 							<Code><![CDATA[uniform(1,3)]]></Code>
 							<Unit Class="TimeUnits"><![CDATA[HOUR]]></Unit>
@@ -41195,7 +41349,7 @@ traceln( "distancia recorrida: " + this.distanceTravel/1000);]]></Action>
 					<PresentationFlag>true</PresentationFlag>
 					<ShowLabel>true</ShowLabel>
 					<Properties SaveInSnapshot="true" ModificatorType="STATIC">
-						<Type><![CDATA[int]]></Type>
+						<Type><![CDATA[double]]></Type>
 						<UnitType><![CDATA[NONE]]></UnitType>
 						<SdArray>false</SdArray>
 						<ParameterEditor>
