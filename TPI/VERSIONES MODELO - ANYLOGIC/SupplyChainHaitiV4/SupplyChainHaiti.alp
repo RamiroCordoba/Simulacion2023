@@ -36,12 +36,11 @@ for (Distributors d : distributor){
 	d.checkRetailers();
 }
 //25% chance que un distribuidor sea destruido
-//if (uniform() < 0.25){
-	//distributor.random().deleteSelf();
-//}
+for (int i=0; i < 3; i++){
+	remove_distributor(distributor.random());
+}
 for (TimeStackChart tsc: chartsRetailers){
 	Retailers r = retailerses.get(chartsRetailers.indexOf(tsc));
-	tsc.removeAll();
 	tsc.addDataSet(retailerses.get(chartsRetailers.indexOf(tsc)).resourcesCountDS);
 }
 
@@ -184,6 +183,21 @@ for (TimeStackChart tsc: chartsRetailers){
 						</InitialValue>
 					</Properties>
 				</Variable>
+				<Variable Class="PlainVariable">
+					<Id>1696854510436</Id>
+					<Name><![CDATA[totalResources]]></Name>
+					<X>790</X><Y>90</Y>
+					<Label><X>10</X><Y>0</Y></Label>
+					<PublicFlag>false</PublicFlag>
+					<PresentationFlag>true</PresentationFlag>
+					<ShowLabel>true</ShowLabel>
+					<Properties SaveInSnapshot="true" Constant="false" AccessType="public" StaticVariable="false">
+						<Type><![CDATA[double]]></Type>        
+						<InitialValue Class="CodeValue">
+							<Code><![CDATA[0]]></Code>
+						</InitialValue>
+					</Properties>
+				</Variable>
 				<Variable Class="CollectionVariable">
 					<Id>1693330235359</Id>
 					<Name><![CDATA[warehouseLocation]]></Name>
@@ -281,7 +295,7 @@ for (TimeStackChart tsc: chartsRetailers){
 					<PublicFlag>false</PublicFlag>
 					<PresentationFlag>true</PresentationFlag>
 					<ShowLabel>true</ShowLabel>
-					<Properties TriggerType="timeout" Mode="cyclic">
+					<Properties TriggerType="timeout" Mode="occuresOnce">
 						<Timeout Class="CodeUnitValue">
 							<Code><![CDATA[1]]></Code>
 							<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
@@ -319,6 +333,41 @@ for (TimeStackChart tsc: chartsRetailers){
 	}
 	weather = "Clear";
 };]]></Action>
+				</Event>
+				<Event>
+					<Id>1696854603088</Id>
+					<Name><![CDATA[checkResources]]></Name>
+					<X>970</X><Y>-120</Y>
+					<Label><X>10</X><Y>0</Y></Label>
+					<PublicFlag>false</PublicFlag>
+					<PresentationFlag>true</PresentationFlag>
+					<ShowLabel>true</ShowLabel>
+					<Properties TriggerType="timeout" Mode="cyclic">
+						<Timeout Class="CodeUnitValue">
+							<Code><![CDATA[1]]></Code>
+							<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
+						</Timeout>
+						<Rate Class="CodeUnitValue">
+							<Code><![CDATA[1]]></Code>
+							<Unit Class="RateUnits"><![CDATA[PER_DAY]]></Unit>
+						</Rate>
+						<OccurrenceAtTime>true</OccurrenceAtTime>
+						<OccurrenceDate>1696924800000</OccurrenceDate>
+						<OccurrenceTime Class="CodeUnitValue">
+							<Code><![CDATA[0]]></Code>
+							<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
+						</OccurrenceTime>
+						<RecurrenceCode Class="CodeUnitValue">
+							<Code><![CDATA[1]]></Code>
+							<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
+						</RecurrenceCode>
+						<Condition><![CDATA[false]]></Condition>
+					</Properties>
+					<Action><![CDATA[double res = 0;
+for (Retailers r : retailerses){
+	res += r.resourcesCount;
+}
+totalResources = res;]]></Action>
 				</Event>
 			</Events>
 			<AgentLinks>
@@ -618,7 +667,7 @@ for (TimeStackChart tsc: chartsRetailers){
 					</Parameters>
 					<ReplicationFlag>true</ReplicationFlag>
 					<Replication Class="CodeValue">
-						<Code><![CDATA[10]]></Code>
+						<Code><![CDATA[20]]></Code>
 					</Replication>
 					<CollectionType>ARRAY_LIST_BASED</CollectionType>
 					<InEnvironment>true</InEnvironment>	
@@ -39524,7 +39573,7 @@ for (TimeStackChart tsc: chartsRetailers){
     			<TimeStackChart>
 					<Id>1696790878361</Id>
 					<Name><![CDATA[chart1]]></Name>
-					<X>0</X><Y>1560</Y>
+					<X>20</X><Y>1560</Y>
 					<Label><X>0</X><Y>-10</Y></Label>
 					<PublicFlag>true</PublicFlag>
 					<PresentationFlag>true</PresentationFlag>
@@ -39569,7 +39618,7 @@ for (TimeStackChart tsc: chartsRetailers){
 					<TimeWindowsMovementType>MOVEMENT_WITH_TIME</TimeWindowsMovementType>		
 					<TimeWindowUnits>MODEL_TIME_UNIT</TimeWindowUnits>
 					<TimeWindowExpression><![CDATA[100]]></TimeWindowExpression>
-					<SamplesToKeep>100</SamplesToKeep>
+					<SamplesToKeep>60</SamplesToKeep>
 					<VerScaleToExpression><![CDATA[1]]></VerScaleToExpression>
 					<VerScaleType>AUTO</VerScaleType>
 					<LabelFormat>MODEL_TIME_UNITS</LabelFormat>
@@ -39622,7 +39671,7 @@ for (TimeStackChart tsc: chartsRetailers){
 					<TimeWindowsMovementType>MOVEMENT_WITH_TIME</TimeWindowsMovementType>		
 					<TimeWindowUnits>MODEL_TIME_UNIT</TimeWindowUnits>
 					<TimeWindowExpression><![CDATA[100]]></TimeWindowExpression>
-					<SamplesToKeep>100</SamplesToKeep>
+					<SamplesToKeep>60</SamplesToKeep>
 					<VerScaleToExpression><![CDATA[1]]></VerScaleToExpression>
 					<VerScaleType>AUTO</VerScaleType>
 					<LabelFormat>MODEL_TIME_UNITS</LabelFormat>
@@ -39675,7 +39724,7 @@ for (TimeStackChart tsc: chartsRetailers){
 					<TimeWindowsMovementType>MOVEMENT_WITH_TIME</TimeWindowsMovementType>		
 					<TimeWindowUnits>MODEL_TIME_UNIT</TimeWindowUnits>
 					<TimeWindowExpression><![CDATA[100]]></TimeWindowExpression>
-					<SamplesToKeep>100</SamplesToKeep>
+					<SamplesToKeep>60</SamplesToKeep>
 					<VerScaleToExpression><![CDATA[1]]></VerScaleToExpression>
 					<VerScaleType>AUTO</VerScaleType>
 					<LabelFormat>MODEL_TIME_UNITS</LabelFormat>
@@ -39728,7 +39777,7 @@ for (TimeStackChart tsc: chartsRetailers){
 					<TimeWindowsMovementType>MOVEMENT_WITH_TIME</TimeWindowsMovementType>		
 					<TimeWindowUnits>MODEL_TIME_UNIT</TimeWindowUnits>
 					<TimeWindowExpression><![CDATA[100]]></TimeWindowExpression>
-					<SamplesToKeep>100</SamplesToKeep>
+					<SamplesToKeep>60</SamplesToKeep>
 					<VerScaleToExpression><![CDATA[1]]></VerScaleToExpression>
 					<VerScaleType>AUTO</VerScaleType>
 					<LabelFormat>MODEL_TIME_UNITS</LabelFormat>
@@ -39781,7 +39830,7 @@ for (TimeStackChart tsc: chartsRetailers){
 					<TimeWindowsMovementType>MOVEMENT_WITH_TIME</TimeWindowsMovementType>		
 					<TimeWindowUnits>MODEL_TIME_UNIT</TimeWindowUnits>
 					<TimeWindowExpression><![CDATA[100]]></TimeWindowExpression>
-					<SamplesToKeep>100</SamplesToKeep>
+					<SamplesToKeep>60</SamplesToKeep>
 					<VerScaleToExpression><![CDATA[1]]></VerScaleToExpression>
 					<VerScaleType>AUTO</VerScaleType>
 					<LabelFormat>MODEL_TIME_UNITS</LabelFormat>
@@ -39789,7 +39838,7 @@ for (TimeStackChart tsc: chartsRetailers){
     			<TimeStackChart>
 					<Id>1696790974797</Id>
 					<Name><![CDATA[chart7]]></Name>
-					<X>0</X><Y>1820</Y>
+					<X>20</X><Y>1820</Y>
 					<Label><X>0</X><Y>-10</Y></Label>
 					<PublicFlag>true</PublicFlag>
 					<PresentationFlag>true</PresentationFlag>
@@ -39834,7 +39883,7 @@ for (TimeStackChart tsc: chartsRetailers){
 					<TimeWindowsMovementType>MOVEMENT_WITH_TIME</TimeWindowsMovementType>		
 					<TimeWindowUnits>MODEL_TIME_UNIT</TimeWindowUnits>
 					<TimeWindowExpression><![CDATA[100]]></TimeWindowExpression>
-					<SamplesToKeep>100</SamplesToKeep>
+					<SamplesToKeep>60</SamplesToKeep>
 					<VerScaleToExpression><![CDATA[1]]></VerScaleToExpression>
 					<VerScaleType>AUTO</VerScaleType>
 					<LabelFormat>MODEL_TIME_UNITS</LabelFormat>
@@ -39887,7 +39936,7 @@ for (TimeStackChart tsc: chartsRetailers){
 					<TimeWindowsMovementType>MOVEMENT_WITH_TIME</TimeWindowsMovementType>		
 					<TimeWindowUnits>MODEL_TIME_UNIT</TimeWindowUnits>
 					<TimeWindowExpression><![CDATA[100]]></TimeWindowExpression>
-					<SamplesToKeep>100</SamplesToKeep>
+					<SamplesToKeep>60</SamplesToKeep>
 					<VerScaleToExpression><![CDATA[1]]></VerScaleToExpression>
 					<VerScaleType>AUTO</VerScaleType>
 					<LabelFormat>MODEL_TIME_UNITS</LabelFormat>
@@ -39940,7 +39989,7 @@ for (TimeStackChart tsc: chartsRetailers){
 					<TimeWindowsMovementType>MOVEMENT_WITH_TIME</TimeWindowsMovementType>		
 					<TimeWindowUnits>MODEL_TIME_UNIT</TimeWindowUnits>
 					<TimeWindowExpression><![CDATA[100]]></TimeWindowExpression>
-					<SamplesToKeep>100</SamplesToKeep>
+					<SamplesToKeep>60</SamplesToKeep>
 					<VerScaleToExpression><![CDATA[1]]></VerScaleToExpression>
 					<VerScaleType>AUTO</VerScaleType>
 					<LabelFormat>MODEL_TIME_UNITS</LabelFormat>
@@ -39993,7 +40042,7 @@ for (TimeStackChart tsc: chartsRetailers){
 					<TimeWindowsMovementType>MOVEMENT_WITH_TIME</TimeWindowsMovementType>		
 					<TimeWindowUnits>MODEL_TIME_UNIT</TimeWindowUnits>
 					<TimeWindowExpression><![CDATA[100]]></TimeWindowExpression>
-					<SamplesToKeep>100</SamplesToKeep>
+					<SamplesToKeep>60</SamplesToKeep>
 					<VerScaleToExpression><![CDATA[1]]></VerScaleToExpression>
 					<VerScaleType>AUTO</VerScaleType>
 					<LabelFormat>MODEL_TIME_UNITS</LabelFormat>
@@ -40046,7 +40095,7 @@ for (TimeStackChart tsc: chartsRetailers){
 					<TimeWindowsMovementType>MOVEMENT_WITH_TIME</TimeWindowsMovementType>		
 					<TimeWindowUnits>MODEL_TIME_UNIT</TimeWindowUnits>
 					<TimeWindowExpression><![CDATA[100]]></TimeWindowExpression>
-					<SamplesToKeep>100</SamplesToKeep>
+					<SamplesToKeep>60</SamplesToKeep>
 					<VerScaleToExpression><![CDATA[1]]></VerScaleToExpression>
 					<VerScaleType>AUTO</VerScaleType>
 					<LabelFormat>MODEL_TIME_UNITS</LabelFormat>
@@ -40076,7 +40125,7 @@ for (TimeStackChart tsc: chartsRetailers){
 				 	<EmbeddedIcon>false</EmbeddedIcon>				
 					<Id>1696793689826</Id>
 					<Name><![CDATA[btnMapa]]></Name>
-					<X>1200</X><Y>2040</Y>
+					<X>1480</X><Y>2030</Y>
 					<Label><X>0</X><Y>-10</Y></Label>
 					<PublicFlag>true</PublicFlag>
 					<PresentationFlag>true</PresentationFlag>
@@ -40093,6 +40142,138 @@ for (TimeStackChart tsc: chartsRetailers){
 						<LabelText><![CDATA[Ver Mapa]]></LabelText>
 					</ExtendedProperties>
 				</Control>
+    			<TimePlot>
+					<Id>1696854385773</Id>
+					<Name><![CDATA[plot]]></Name>
+					<X>1340</X><Y>1560</Y>
+					<Label><X>0</X><Y>-10</Y></Label>
+					<PublicFlag>true</PublicFlag>
+					<PresentationFlag>true</PresentationFlag>
+					<ShowLabel>false</ShowLabel>
+					<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+					<AutoUpdate>true</AutoUpdate>
+					<OccurrenceAtTime>true</OccurrenceAtTime>
+					<OccurrenceDate>1696924800000</OccurrenceDate>
+					<OccurrenceTime Class="CodeUnitValue">
+						<Code><![CDATA[0]]></Code>
+						<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
+					</OccurrenceTime>
+					<RecurrenceCode Class="CodeUnitValue">
+						<Code><![CDATA[1]]></Code>
+						<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
+					</RecurrenceCode>
+					<EmbeddedIcon>false</EmbeddedIcon>
+					<Width>260</Width>
+					<Height>210</Height>
+					<BackgroundColor/>
+					<BorderColor/>
+					<ChartArea>
+						<XOffset>50</XOffset>
+						<YOffset>30</YOffset>
+						<Width>180</Width>
+						<Height>120</Height>
+						<BackgroundColor>-1</BackgroundColor>
+						<BorderColor>-16777216</BorderColor>
+						<GridColor>-12566464</GridColor>
+					</ChartArea>
+					<Legend>
+						<Place>SOUTH</Place>
+						<TextColor>-16777216</TextColor>
+						<Size>30</Size>
+					</Legend>
+					<Labels>
+						<HorLabelsPosition>DEFAULT</HorLabelsPosition>
+						<VerLabelsPosition>DEFAULT</VerLabelsPosition>
+						<TextColor>-12566464</TextColor>
+					</Labels>
+					<ShowLegend>true</ShowLegend>
+					<TimeWindowsMovementType>MOVEMENT_WITH_TIME</TimeWindowsMovementType>		
+					<TimeWindowUnits>MODEL_TIME_UNIT</TimeWindowUnits>
+					<VerScaleFromExpression><![CDATA[0]]></VerScaleFromExpression>
+					<VerScaleToExpression><![CDATA[1]]></VerScaleToExpression>
+					<VerScaleType>AUTO</VerScaleType>
+					<DrawLine>true</DrawLine>
+					<Interpolation>LINEAR</Interpolation>
+					<DatasetExpression>  
+						<Title><![CDATA[totalDistanceTraveled]]></Title>
+					<Id>1696854385790</Id>
+					<Color>-7667573</Color>
+					<Expression2><![CDATA[totalDistanceTraveled]]></Expression2>
+					<Expression2Flag>true</Expression2Flag>
+						<PointStyle>CIRCLE</PointStyle>
+						<LineWidth>1.0</LineWidth>
+					</DatasetExpression>
+					<SamplesToKeep>100</SamplesToKeep>
+					<TimeWindowExpression><![CDATA[60.0]]></TimeWindowExpression>
+					<FillAreaUnderLine>false</FillAreaUnderLine>
+					<LabelFormat>MODEL_TIME_UNITS</LabelFormat>
+    			</TimePlot>
+    			<TimePlot>
+					<Id>1696854933348</Id>
+					<Name><![CDATA[plot1]]></Name>
+					<X>1340</X><Y>1820</Y>
+					<Label><X>0</X><Y>-10</Y></Label>
+					<PublicFlag>true</PublicFlag>
+					<PresentationFlag>true</PresentationFlag>
+					<ShowLabel>false</ShowLabel>
+					<DrawMode>SHAPE_DRAW_2D3D</DrawMode>
+					<AutoUpdate>true</AutoUpdate>
+					<OccurrenceAtTime>true</OccurrenceAtTime>
+					<OccurrenceDate>1696924800000</OccurrenceDate>
+					<OccurrenceTime Class="CodeUnitValue">
+						<Code><![CDATA[0]]></Code>
+						<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
+					</OccurrenceTime>
+					<RecurrenceCode Class="CodeUnitValue">
+						<Code><![CDATA[1]]></Code>
+						<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
+					</RecurrenceCode>
+					<EmbeddedIcon>false</EmbeddedIcon>
+					<Width>260</Width>
+					<Height>210</Height>
+					<BackgroundColor/>
+					<BorderColor/>
+					<ChartArea>
+						<XOffset>50</XOffset>
+						<YOffset>30</YOffset>
+						<Width>180</Width>
+						<Height>120</Height>
+						<BackgroundColor>-1</BackgroundColor>
+						<BorderColor>-16777216</BorderColor>
+						<GridColor>-12566464</GridColor>
+					</ChartArea>
+					<Legend>
+						<Place>SOUTH</Place>
+						<TextColor>-16777216</TextColor>
+						<Size>30</Size>
+					</Legend>
+					<Labels>
+						<HorLabelsPosition>DEFAULT</HorLabelsPosition>
+						<VerLabelsPosition>DEFAULT</VerLabelsPosition>
+						<TextColor>-12566464</TextColor>
+					</Labels>
+					<ShowLegend>true</ShowLegend>
+					<TimeWindowsMovementType>MOVEMENT_WITH_TIME</TimeWindowsMovementType>		
+					<TimeWindowUnits>MODEL_TIME_UNIT</TimeWindowUnits>
+					<VerScaleFromExpression><![CDATA[0]]></VerScaleFromExpression>
+					<VerScaleToExpression><![CDATA[1]]></VerScaleToExpression>
+					<VerScaleType>AUTO</VerScaleType>
+					<DrawLine>true</DrawLine>
+					<Interpolation>LINEAR</Interpolation>
+					<DatasetExpression>  
+						<Title><![CDATA[totalResources]]></Title>
+					<Id>1696854933350</Id>
+					<Color>-10496</Color>
+					<Expression2><![CDATA[totalResources]]></Expression2>
+					<Expression2Flag>true</Expression2Flag>
+						<PointStyle>CIRCLE</PointStyle>
+						<LineWidth>1.0</LineWidth>
+					</DatasetExpression>
+					<SamplesToKeep>100</SamplesToKeep>
+					<TimeWindowExpression><![CDATA[60.0]]></TimeWindowExpression>
+					<FillAreaUnderLine>false</FillAreaUnderLine>
+					<LabelFormat>MODEL_TIME_UNITS</LabelFormat>
+    			</TimePlot>
 			</Presentation>
 
 				</Level>
@@ -40221,7 +40402,7 @@ for (TimeStackChart tsc: chartsRetailers){
 					<PresentationFlag>true</PresentationFlag>
 					<ShowLabel>false</ShowLabel>
 					<Title><![CDATA[]]></Title>
-					<Width>1320</Width>
+					<Width>1600</Width>
 					<Height>540</Height>
 				</Area>
 				<Area>
@@ -40478,7 +40659,7 @@ closestDistributor._connectedRetailers.addAll(this._connectedRetailers);]]></Des
 							<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
 						</OccurrenceTime>
 						<RecurrenceCode Class="CodeUnitValue">
-							<Code><![CDATA[1]]></Code>
+							<Code><![CDATA[0.35]]></Code>
 							<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
 						</RecurrenceCode>
 						<Condition><![CDATA[false]]></Condition>
@@ -40504,8 +40685,7 @@ for (int i=0; i < n; i++){
 
 for (Retailers ret : connectedRetailers){
 	if (((ret.resourcesCount / ret.maximumCapacity) <= 0.5)){
-		sendResources(ret.consumptionPerDay*3, ret);
-	}
+		sendResources(ret.consumptionPerDay*1.5, ret);	}
 }]]></Action>
 				</Event>
 			</Events>
@@ -41222,7 +41402,8 @@ else {
 	resourcesCount = 0;
 	daysWithoutResources +=1;
 };
-calculateColour();]]></Action>
+calculateColour();
+]]></Action>
 				</Event>
 			</Events>
 			<Functions>
@@ -46020,8 +46201,8 @@ if (order.amount >= 0){
 				<StopOption><![CDATA[Stop at specified time]]></StopOption>
 				<InitialDate><![CDATA[1696723200000]]></InitialDate>	
 				<InitialTime><![CDATA[0.0]]></InitialTime>	
-				<FinalDate><![CDATA[1698019200000]]></FinalDate>	
-				<FinalTime><![CDATA[15.0]]></FinalTime>	
+				<FinalDate><![CDATA[1701907200000]]></FinalDate>	
+				<FinalTime><![CDATA[60.0]]></FinalTime>	
 			</ModelTimeProperties>
 			<BypassInitialScreen>true</BypassInitialScreen>
 		</SimulationExperiment>	
