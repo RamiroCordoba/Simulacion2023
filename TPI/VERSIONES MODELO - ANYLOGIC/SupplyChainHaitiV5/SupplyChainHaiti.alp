@@ -38,13 +38,13 @@ for (int i=3; i < vehicles.size()-3; i++){
 }
 
 
-
+/*
 for (int i = 0; i < 3; i++) {
     Random rand = new Random();
     rand.setSeed(System.currentTimeMillis());
     remove_distributor(distributor.random(rand));
 }
-
+*/
 
 
 for (TimeStackChart tsc: chartsRetailers){
@@ -222,7 +222,7 @@ PrincipalArea.navigateTo();
 					<Properties SaveInSnapshot="true" Constant="false" AccessType="public" StaticVariable="false">
 						<Type><![CDATA[double]]></Type>        
 						<InitialValue Class="CodeValue">
-							<Code><![CDATA[0.35]]></Code>
+							<Code><![CDATA[1]]></Code>
 						</InitialValue>
 					</Properties>
 				</Variable>
@@ -44151,7 +44151,7 @@ if (regionName != null) {
 					</Points>
 					<IconOffset>30.0</IconOffset>
 					<Properties Source="1693333863415" Target="1693333881070" Trigger="message">
-						<Action><![CDATA[startTravel = System.currentTimeMillis();
+						<Action><![CDATA[startTravel = time(HOUR);
 moveTo(msg.retailer);
 order = msg;
 
@@ -44226,8 +44226,8 @@ traceln("Enviando " + msg.amount + " a " + msg.retailer.location);
 					<IconOffset>170.0</IconOffset>
 					<Properties Source="1693864713455" Target="1693333863415" Trigger="arrival">
 						<Action><![CDATA[moveTo(Distributor);
-timeTravel += (System.currentTimeMillis() - startTravel)/(3600000);
-main.totalTimeTraveled += (System.currentTimeMillis() - startTravel)/(60000);]]></Action>
+timeTravel += (time(HOUR) - startTravel);
+main.totalTimeTraveled += (time(HOUR) - startTravel);]]></Action>
 						<Timeout Class="CodeUnitValue">
 							<Code><![CDATA[1]]></Code>
 							<Unit Class="TimeUnits"><![CDATA[DAY]]></Unit>
